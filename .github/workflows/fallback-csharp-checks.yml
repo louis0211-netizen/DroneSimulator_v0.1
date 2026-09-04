@@ -1,0 +1,26 @@
+name: Fallback C# Checks
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  compile-with-stubs:
+    name: Compile Unity scripts with local stubs
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Runtime compile check
+        shell: powershell
+        run: powershell -ExecutionPolicy Bypass -File "work\compile-check\Invoke-CompileCheck.ps1"
+
+      - name: Editor compile check
+        shell: powershell
+        run: powershell -ExecutionPolicy Bypass -File "work\compile-check\Invoke-EditorCompileCheck.ps1"
+

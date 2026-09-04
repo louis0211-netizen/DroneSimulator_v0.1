@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6264ee87acea3446a12f21f1aef7c9c, type: 3}
+  m_Name: DefaultDronePreset
+  m_EditorClassIdentifier: DroneSimulator.Runtime::DroneSimulator.Config.DronePreset
+  massKg: 0.85
+  armLengthMeters: 0.22
+  maxMotorThrustNewton: 8.5
+  maxMotorReactionTorqueNewtonMeter: 0.18
+  motorResponseTimeSeconds: 0.08
+  idleMotorOutputWhenArmed: 0.04
+  linearDragCoefficient: 0.18
+  angularDragCoefficient: 0.08
+  maxStabilizedAngleDegrees: 28
+  maxRateDegreesPerSecond: 220
+  rollPitchMixAuthority: 0.32
+  yawMixAuthority: 0.22
+  stabilizedAnglePid:
+    proportional: 4.5
+    integral: 0
+    derivative: 0.08
+    integralLimit: 0
+    outputLimit: 4.5
+  rollPitchRatePid:
+    proportional: 0.08
+    integral: 0.01
+    derivative: 0.001
+    integralLimit: 1
+    outputLimit: 1
+  yawRatePid:
+    proportional: 0.09
+    integral: 0.008
+    derivative: 0.0008
+    integralLimit: 1
+    outputLimit: 1
+  stickDeadZone: 0.04
+  stickExpo: 0.25
+  throttleExpo: 0.15

@@ -17,6 +17,7 @@ The first milestone focuses on physical flight behavior before expanding the gam
 - Unity Physics / Rigidbody
 - iOS Build Target
 - Xcode install to iPhone
+- Unity Build Automation iOS build path
 - Landscape orientation
 - Mode 2 controls
 
@@ -111,6 +112,7 @@ GitHub Actions workflows are included under `.github/workflows`:
 - `ios-xcode-export.yml`: manual macOS iOS Xcode export, requires Unity secrets.
 
 See `GITHUB_SETUP.md` for repository setup and required secrets.
+See `UNITY_BUILD_AUTOMATION.md` for Unity Build Automation iOS setup.
 
 After Unity is installed and Unity Hub is signed in, run:
 

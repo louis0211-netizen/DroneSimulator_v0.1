@@ -44,6 +44,7 @@ namespace DroneSimulator.Editor
             CreateHudAndControls(inputManager, flightController, dronePhysics, batterySimulator, cameraRig, trainingSession);
 
             EditorSceneManager.SaveScene(scene, ScenePath);
+            IosBuildConfigurator.EnsureSceneIsInBuildSettings();
             if (!Application.isBatchMode)
             {
                 EditorUtility.DisplayDialog("Drone Simulator", "Created MVP Training Scene at:\n" + ScenePath, "OK");

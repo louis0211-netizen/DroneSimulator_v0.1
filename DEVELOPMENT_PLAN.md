@@ -85,12 +85,16 @@ Status:
 - Generate MVP scene from an Editor menu.
 - Provide a batchmode entrypoint for scene generation and iOS configuration.
 - Provide an iOS Xcode project build entrypoint.
+- Prepare Unity Build Automation iOS settings.
 
 Status:
 
 - `Drone Simulator > Configure iOS Landscape Build` implemented.
 - `Drone Simulator > Create MVP Training Scene` implemented.
 - `Drone Simulator > Build iOS Xcode Project` implemented.
+- Bundle ID set to `com.louis0211netizen.dronesimulator`.
+- MVP scene is added to Unity Build Settings automatically.
+- Unity Build Automation setup guide added.
 
 Platform note:
 

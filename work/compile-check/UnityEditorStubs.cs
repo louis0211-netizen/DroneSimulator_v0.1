@@ -76,6 +76,16 @@ namespace UnityEditor
     {
         public static bool SwitchActiveBuildTarget(BuildTargetGroup group, BuildTarget target) => true;
     }
+
+    public sealed class EditorBuildSettingsScene
+    {
+        public EditorBuildSettingsScene(string path, bool enabled) { }
+    }
+
+    public static class EditorBuildSettings
+    {
+        public static EditorBuildSettingsScene[] scenes;
+    }
 }
 
 namespace UnityEditor.Build
@@ -123,5 +133,6 @@ namespace UnityEditor.SceneManagement
     {
         public static Scene NewScene(NewSceneSetup setup, NewSceneMode mode) => new Scene();
         public static bool SaveScene(Scene scene, string dstScenePath) => true;
+        public static bool SaveOpenScenes() => true;
     }
 }

@@ -4,6 +4,9 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/DroneSimulator/Scenes/MVP_TrainingGround.unity
+    guid: dfebe41ae215515438625e88c13132ea
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

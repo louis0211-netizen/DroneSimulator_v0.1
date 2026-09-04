@@ -8,8 +8,24 @@ on:
   workflow_dispatch:
 
 jobs:
+  compile-with-stubs:
+    name: Compile Unity scripts with local stubs
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Runtime compile check
+        shell: powershell
+        run: powershell -ExecutionPolicy Bypass -File "work\compile-check\Invoke-CompileCheck.ps1"
+
+      - name: Editor compile check
+        shell: powershell
+        run: powershell -ExecutionPolicy Bypass -File "work\compile-check\Invoke-EditorCompileCheck.ps1"
+
   standalone-windows-build:
-    name: Unity import and Windows build
+    name: Unity import and Windows build when licensed
     runs-on: ubuntu-latest
 
     steps:
@@ -18,7 +34,21 @@ jobs:
         with:
           lfs: true
 
+      - name: Check Unity license secrets
+        id: unity_secrets
+        shell: bash
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        run: |
+          if [ -n "$UNITY_LICENSE" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Unity build skipped::UNITY_LICENSE is not configured. The local-stub C# compile check still runs; add Unity GameCI secrets to enable the full Unity build."
+          fi
+
       - name: Cache Unity Library
+        if: steps.unity_secrets.outputs.available == 'true'
         uses: actions/cache@v4
         with:
           path: Library
@@ -27,6 +57,7 @@ jobs:
             Library-${{ runner.os }}-
 
       - name: Build StandaloneWindows64
+        if: steps.unity_secrets.outputs.available == 'true'
         uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -37,8 +68,8 @@ jobs:
           targetPlatform: StandaloneWindows64
 
       - name: Upload Windows build
+        if: steps.unity_secrets.outputs.available == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: DroneSimulator-Windows
           path: build
-

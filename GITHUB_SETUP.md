@@ -38,9 +38,10 @@ File:
 
 Purpose:
 
-- Uses GameCI Unity Builder.
-- Imports the Unity project and builds `StandaloneWindows64`.
-- Requires Unity license secrets.
+- Always runs the local C# stub compile checks on `windows-latest`.
+- Uses GameCI Unity Builder only when `UNITY_LICENSE` is configured.
+- Imports the Unity project and builds `StandaloneWindows64` when licensed.
+- Shows a GitHub Actions notice instead of failing when Unity secrets have not been added yet.
 
 ### iOS Xcode Export
 
@@ -57,13 +58,15 @@ Purpose:
 
 ## Required GitHub Secrets
 
-For GameCI workflows, add these repository secrets:
+For full GameCI Unity build/export workflows, add these repository secrets:
 
 - `UNITY_LICENSE`
 - `UNITY_EMAIL`
 - `UNITY_PASSWORD`
 
 For Unity Personal, generate and store a Unity license file following GameCI activation instructions.
+
+Without these secrets, `Unity Compile` still performs the fallback C# compile checks and skips the GameCI build step.
 
 ## Local Validation
 
@@ -78,4 +81,3 @@ Tools\Run-UnityBatchCompile.cmd
 
 - Windows is fine for Unity source development and compile/import validation.
 - iOS export and installation to iPhone should be done on macOS with Xcode and iOS Build Support.
-

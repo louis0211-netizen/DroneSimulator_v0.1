@@ -100,7 +100,7 @@ Unity batchmode remains the authoritative compile check once Unity 6.3 LTS is av
 GitHub Actions workflows are included under `.github/workflows`:
 
 - `fallback-csharp-checks.yml`: Windows runner, no Unity license required, uses local stubs.
-- `unity-compile.yml`: GameCI Unity import/build check, requires Unity secrets.
+- `unity-compile.yml`: runs local stub compile checks and, when `UNITY_LICENSE` is configured, runs a GameCI Unity import/build check.
 - `ios-xcode-export.yml`: manual macOS iOS Xcode export, requires Unity secrets.
 
 See `GITHUB_SETUP.md` for repository setup and required secrets.

@@ -35,7 +35,7 @@ namespace DroneSimulator.Editor
 
         public static void CreateSceneAndConfigureIos()
         {
-            EnsureSceneExists();
+            DroneSimulatorSceneBuilder.CreateMvpTrainingScene();
             IosBuildConfigurator.ConfigureIosLandscapeBuild();
         }
 

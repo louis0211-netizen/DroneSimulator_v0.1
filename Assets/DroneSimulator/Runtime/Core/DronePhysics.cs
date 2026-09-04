@@ -28,6 +28,8 @@ namespace DroneSimulator.Core
         public MotorCommand[] CurrentMotorCommands => currentMotorCommands;
         public float AltitudeMeters => transform.position.y;
         public float SpeedMetersPerSecond => body != null ? body.linearVelocity.magnitude : 0f;
+        public float VerticalSpeedMetersPerSecond => body != null ? body.linearVelocity.y : 0f;
+        public Vector3 WorldVelocity => body != null ? body.linearVelocity : Vector3.zero;
 
         private void Awake()
         {

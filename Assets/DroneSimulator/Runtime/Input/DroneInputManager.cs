@@ -28,6 +28,7 @@ namespace DroneSimulator.Input
         private bool cameraQueued;
         private bool flightModeQueued;
 
+        public DroneInputState LastInputState => state;
         public UnityEvent ResetRequested => resetRequested;
         public UnityEvent CameraToggleRequested => cameraToggleRequested;
 

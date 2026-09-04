@@ -2,7 +2,10 @@ using System;
 
 namespace UnityEngine
 {
-    public class Object { }
+    public class Object
+    {
+        public static T FindFirstObjectByType<T>() where T : Object => default(T);
+    }
     public class Component : Object
     {
         public Transform transform { get; } = new Transform();

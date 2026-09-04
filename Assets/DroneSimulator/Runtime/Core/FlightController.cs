@@ -22,6 +22,7 @@ namespace DroneSimulator.Core
         public FlightMode CurrentMode => flightMode;
         public bool IsArmed => armed;
         public float FlightTimeSeconds => armed ? Time.time - flightStartTime : 0f;
+        public float ArmThrottleLockout => armThrottleLockout;
 
         private void Awake()
         {
@@ -40,6 +41,11 @@ namespace DroneSimulator.Core
             {
                 Arm();
             }
+        }
+
+        public bool CanArmAtThrottle(float currentThrottle)
+        {
+            return currentThrottle <= armThrottleLockout;
         }
 
         public void Arm()

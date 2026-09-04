@@ -55,6 +55,29 @@ Status:
 - Landscape configurator is implemented.
 - Editor scene builder creates a first-pass touch HUD and buttons.
 - Safe-area fitting is implemented for iPhone landscape UI.
+- Button labels now update at runtime for ARM/DISARM, camera, and flight mode.
+
+## Phase 3.5: MVP App Loop
+
+- Add a runtime training session layer outside flight physics.
+- Guide the first flight loop:
+  - ARM
+  - Take off
+  - Hover
+  - Pitch forward
+  - Pitch backward
+  - Roll/strafe
+  - Yaw
+  - Land
+  - Crash/reset recovery
+- Show throttle lockout, crash, and low-battery warnings.
+- Keep the app flow separate from `DronePhysics`, `FlightController`, and `MotorMixer`.
+
+Status:
+
+- `FlightTrainingSession` implemented.
+- MVP scene builder wires training objectives, warning text, and dynamic button labels.
+- Batch scene refresh entrypoint now rebuilds the MVP scene instead of only checking that it exists.
 
 ## Phase 6: Build Pipeline
 
@@ -84,6 +107,12 @@ Platform note:
   - Flight Time
   - Flight Mode
   - Battery simulation
+
+Status:
+
+- FPV and chase cameras are implemented.
+- HUD displays altitude, speed, flight time, flight mode, arm state, and battery.
+- Objective/warning HUD is implemented through `FlightTrainingSession`.
 
 ## Phase 5: Training Ground
 

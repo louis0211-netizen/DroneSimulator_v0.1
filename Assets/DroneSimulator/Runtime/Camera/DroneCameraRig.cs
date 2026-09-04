@@ -12,6 +12,8 @@ namespace DroneSimulator.Camera
 
         private bool useFpv = true;
 
+        public bool IsFpvCameraActive => useFpv;
+
         private void LateUpdate()
         {
             if (target == null)
@@ -42,4 +44,3 @@ namespace DroneSimulator.Camera
         }
     }
 }
-

@@ -35,6 +35,8 @@ Implemented in this repository:
 - iPhone landscape dual virtual joystick scripts
 - Unity Editor scene builder
 - Minimal camera, HUD, and training ground hooks
+- Runtime training objective loop for ARM, takeoff, hover, movement, yaw, landing, crash, and reset
+- Dynamic button labels and warning HUD for throttle lockout, crash, and battery state
 
 ## Quick Start in Unity
 
@@ -54,6 +56,7 @@ The generated scene includes:
 - Training ground
 - FPV and chase cameras
 - Landscape touch HUD
+- Objective and warning HUD
 - Left and right virtual joysticks
 - ARM, RESET, CAMERA, and MODE buttons
 
@@ -72,6 +75,10 @@ Buttons:
 - RESET
 - CAMERA
 - FLIGHT MODE
+
+The first training loop appears in the top HUD and advances through:
+
+ARM -> take off -> hover -> forward -> backward -> roll/strafe -> yaw -> land -> reset/crash recovery.
 
 ## Suggested Unity Setup
 

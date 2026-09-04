@@ -29,6 +29,7 @@ namespace DroneSimulator.Editor
 
             GameObject systems = new GameObject("Systems");
             systems.AddComponent<IosLandscapeConfigurator>();
+            FlightTrainingSession trainingSession = systems.AddComponent<FlightTrainingSession>();
 
             GameObject environment = new GameObject("Training Ground Builder");
             environment.AddComponent<TrainingGroundBuilder>();
@@ -40,7 +41,7 @@ namespace DroneSimulator.Editor
             BatterySimulator batterySimulator = drone.GetComponent<BatterySimulator>();
 
             DroneCameraRig cameraRig = CreateCameraRig(drone.transform);
-            CreateHudAndControls(inputManager, flightController, dronePhysics, batterySimulator, cameraRig);
+            CreateHudAndControls(inputManager, flightController, dronePhysics, batterySimulator, cameraRig, trainingSession);
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             if (!Application.isBatchMode)
@@ -137,7 +138,8 @@ namespace DroneSimulator.Editor
             FlightController flightController,
             DronePhysics dronePhysics,
             BatterySimulator batterySimulator,
-            DroneCameraRig cameraRig)
+            DroneCameraRig cameraRig,
+            FlightTrainingSession trainingSession)
         {
             GameObject eventSystem = new GameObject("EventSystem");
             eventSystem.AddComponent<EventSystem>();
@@ -182,18 +184,34 @@ namespace DroneSimulator.Editor
             SetObject(inputManager, "rightJoystick", rightJoystick);
 
             DroneHudController hud = CreateHud(safeArea.transform, dronePhysics, flightController, batterySimulator);
+            Text objectiveText = CreateTopCenterText(safeArea.transform, "Objective", new Vector2(0f, -34f), 42);
+            Text warningText = CreateTopCenterText(safeArea.transform, "Warning", new Vector2(0f, -82f), 32);
+            warningText.color = new Color(1f, 0.42f, 0.26f, 1f);
 
-            Button armButton = CreateButton(safeArea.transform, "ARM", new Vector2(0f, 118f));
-            Button resetButton = CreateButton(safeArea.transform, "RESET", new Vector2(0f, 48f));
-            Button cameraButton = CreateButton(safeArea.transform, "CAMERA", new Vector2(0f, -22f));
-            Button modeButton = CreateButton(safeArea.transform, "MODE", new Vector2(0f, -92f));
+            UiButton armButton = CreateButton(safeArea.transform, "ARM", new Vector2(0f, 118f));
+            UiButton resetButton = CreateButton(safeArea.transform, "RESET", new Vector2(0f, 48f));
+            UiButton cameraButton = CreateButton(safeArea.transform, "FPV", new Vector2(0f, -22f));
+            UiButton modeButton = CreateButton(safeArea.transform, "STABILIZED", new Vector2(0f, -92f));
 
-            UnityEventTools.AddPersistentListener(armButton.onClick, inputManager.QueueArmToggle);
-            UnityEventTools.AddPersistentListener(resetButton.onClick, inputManager.QueueReset);
-            UnityEventTools.AddPersistentListener(cameraButton.onClick, inputManager.QueueCameraToggle);
-            UnityEventTools.AddPersistentListener(modeButton.onClick, inputManager.QueueFlightModeToggle);
+            UnityEventTools.AddPersistentListener(armButton.button.onClick, inputManager.QueueArmToggle);
+            UnityEventTools.AddPersistentListener(resetButton.button.onClick, inputManager.QueueReset);
+            UnityEventTools.AddPersistentListener(cameraButton.button.onClick, inputManager.QueueCameraToggle);
+            UnityEventTools.AddPersistentListener(modeButton.button.onClick, inputManager.QueueFlightModeToggle);
             UnityEventTools.AddPersistentListener(inputManager.ResetRequested, hud.ResetBattery);
             UnityEventTools.AddPersistentListener(inputManager.CameraToggleRequested, cameraRig.ToggleCamera);
+            UnityEventTools.AddPersistentListener(inputManager.ResetRequested, trainingSession.RestartTraining);
+
+            SetObject(trainingSession, "dronePhysics", dronePhysics);
+            SetObject(trainingSession, "flightController", flightController);
+            SetObject(trainingSession, "inputManager", inputManager);
+            SetObject(trainingSession, "batterySimulator", batterySimulator);
+            SetObject(trainingSession, "cameraRig", cameraRig);
+            SetObject(trainingSession, "objectiveText", objectiveText);
+            SetObject(trainingSession, "warningText", warningText);
+            SetObject(trainingSession, "armButtonText", armButton.label);
+            SetObject(trainingSession, "resetButtonText", resetButton.label);
+            SetObject(trainingSession, "cameraButtonText", cameraButton.label);
+            SetObject(trainingSession, "modeButtonText", modeButton.label);
         }
 
         private static VirtualJoystick CreateJoystick(Transform parent, string name, Vector2 anchoredPosition, Vector2 anchor, bool springY)
@@ -239,9 +257,9 @@ namespace DroneSimulator.Editor
             return hud;
         }
 
-        private static Button CreateButton(Transform parent, string label, Vector2 anchoredPosition)
+        private static UiButton CreateButton(Transform parent, string label, Vector2 anchoredPosition)
         {
-            GameObject buttonObject = CreateUiRect(parent, label + " Button", anchoredPosition, new Vector2(180f, 56f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
+            GameObject buttonObject = CreateUiRect(parent, label + " Button", anchoredPosition, new Vector2(210f, 56f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
             Image image = buttonObject.AddComponent<Image>();
             image.color = new Color(0.08f, 0.09f, 0.1f, 0.82f);
             Button button = buttonObject.AddComponent<Button>();
@@ -255,7 +273,7 @@ namespace DroneSimulator.Editor
             text.text = label;
             text.alignment = TextAnchor.MiddleCenter;
 
-            return button;
+            return new UiButton(button, text);
         }
 
         private static Text CreateText(Transform parent, string name, Vector2 anchoredPosition)
@@ -266,6 +284,19 @@ namespace DroneSimulator.Editor
             text.fontSize = 24;
             text.color = Color.white;
             text.alignment = TextAnchor.MiddleLeft;
+            text.raycastTarget = false;
+            text.text = name;
+            return text;
+        }
+
+        private static Text CreateTopCenterText(Transform parent, string name, Vector2 anchoredPosition, int fontSize)
+        {
+            GameObject textObject = CreateUiRect(parent, name, anchoredPosition, new Vector2(980f, 44f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
+            Text text = textObject.AddComponent<Text>();
+            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            text.fontSize = fontSize;
+            text.color = Color.white;
+            text.alignment = TextAnchor.MiddleCenter;
             text.raycastTarget = false;
             text.text = name;
             return text;
@@ -302,6 +333,18 @@ namespace DroneSimulator.Editor
             SerializedObject serializedObject = new SerializedObject(target);
             serializedObject.FindProperty(propertyName).boolValue = value;
             serializedObject.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private readonly struct UiButton
+        {
+            public readonly Button button;
+            public readonly Text label;
+
+            public UiButton(Button button, Text label)
+            {
+                this.button = button;
+                this.label = label;
+            }
         }
     }
 }

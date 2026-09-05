@@ -23,4 +23,12 @@ work/*.log
 work/*.exe
 work/*.zip
 work/*.tmp
+work/signing/
 outputs/
+
+# Local signing assets
+*.p12
+*.pfx
+*.cer
+*.certSigningRequest
+*.mobileprovision

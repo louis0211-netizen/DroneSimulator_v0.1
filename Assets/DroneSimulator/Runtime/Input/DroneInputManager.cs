@@ -32,6 +32,12 @@ namespace DroneSimulator.Input
         public UnityEvent ResetRequested => resetRequested;
         public UnityEvent CameraToggleRequested => cameraToggleRequested;
 
+        public void ConfigureVirtualJoysticks(VirtualJoystick newLeftJoystick, VirtualJoystick newRightJoystick)
+        {
+            leftJoystick = newLeftJoystick;
+            rightJoystick = newRightJoystick;
+        }
+
         public DroneInputState ReadInput()
         {
             UpdateContinuousInput();

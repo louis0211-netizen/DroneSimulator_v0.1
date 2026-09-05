@@ -29,6 +29,8 @@ namespace UnityEngine
     [AttributeUsage(AttributeTargets.Class)] public sealed class CreateAssetMenuAttribute : Attribute { public string menuName; public string fileName; }
     [AttributeUsage(AttributeTargets.Class)] public sealed class DisallowMultipleComponent : Attribute { }
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)] public sealed class RequireComponent : Attribute { public RequireComponent(Type type) { } }
+    [AttributeUsage(AttributeTargets.Method)] public sealed class RuntimeInitializeOnLoadMethodAttribute : Attribute { public RuntimeInitializeOnLoadMethodAttribute(RuntimeInitializeLoadType loadType) { } }
+    public enum RuntimeInitializeLoadType { AfterSceneLoad }
 
     public struct Vector2
     {
@@ -122,6 +124,7 @@ namespace UnityEngine
         public Vector3 TransformPoint(Vector3 point) => point;
         public void SetPositionAndRotation(Vector3 position, Quaternion rotation) { this.position = position; this.rotation = rotation; }
         public void SetParent(Transform parent) { }
+        public void SetParent(Transform parent, bool worldPositionStays) { }
     }
 
     public enum ForceMode { Force }
@@ -155,19 +158,24 @@ namespace UnityEngine
     {
         public string name;
         public Transform transform { get; } = new Transform();
+        public bool activeSelf;
         public GameObject() { }
         public GameObject(string name) { this.name = name; }
         public GameObject(string name, params Type[] components) { this.name = name; }
         public static GameObject CreatePrimitive(PrimitiveType type) => new GameObject();
         public T GetComponent<T>() { return default(T); }
         public T AddComponent<T>() where T : new() { return new T(); }
+        public void SetActive(bool active) { activeSelf = active; }
     }
 
-    public enum PrimitiveType { Cube, Sphere, Capsule, Cylinder }
+    public enum PrimitiveType { Cube, Sphere, Capsule, Cylinder, Quad }
     public class Shader : Object { public static Shader Find(string name) => new Shader(); }
+    public class Texture : Object { }
+    public class Texture2D : Texture { }
     public class Material : Object
     {
         public Color color;
+        public Texture mainTexture;
         public Material() { }
         public Material(Shader shader) { }
     }
@@ -217,6 +225,7 @@ namespace UnityEngine
     {
         public RenderMode renderMode;
         public Camera worldCamera;
+        public int sortingOrder;
     }
 
     public enum RenderMode { ScreenSpaceOverlay }
@@ -308,6 +317,7 @@ namespace UnityEngine
     public static class Resources
     {
         public static T GetBuiltinResource<T>(string path) where T : Object, new() => new T();
+        public static T Load<T>(string path) where T : Object => default(T);
     }
 
     public enum TextAnchor { MiddleLeft, MiddleCenter }
@@ -333,6 +343,7 @@ namespace UnityEngine.UI
     {
         public UnityEngine.Color color;
         public UnityEngine.RectTransform rectTransform { get; } = new UnityEngine.RectTransform();
+        public bool raycastTarget;
         public void SetVerticesDirty() { }
         protected virtual void OnPopulateMesh(VertexHelper vh) { }
     }
@@ -346,8 +357,9 @@ namespace UnityEngine.UI
 
     public class VertexHelper
     {
+        public int currentVertCount;
         public void Clear() { }
-        public void AddVert(UIVertex vertex) { }
+        public void AddVert(UIVertex vertex) { currentVertCount++; }
         public void AddTriangle(int a, int b, int c) { }
     }
 
@@ -362,9 +374,8 @@ namespace UnityEngine.UI
         public enum ScaleMode { ScaleWithScreenSize }
     }
 
-    public class Image : UnityEngine.Component
+    public class Image : Graphic
     {
-        public UnityEngine.Color color;
     }
 
     public class Button : UnityEngine.Component
@@ -390,6 +401,7 @@ namespace UnityEngine.Events
     public class UnityEvent
     {
         public void Invoke() { }
+        public void AddListener(UnityAction action) { }
     }
 }
 

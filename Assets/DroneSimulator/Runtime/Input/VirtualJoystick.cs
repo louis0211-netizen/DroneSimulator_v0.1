@@ -16,6 +16,16 @@ namespace DroneSimulator.Input
 
         public Vector2 Value => value;
 
+        public void Configure(RectTransform newHandle, float newRadiusPixels, bool newSpringToCenterX, bool newSpringToCenterY)
+        {
+            handle = newHandle;
+            radiusPixels = Mathf.Max(1f, newRadiusPixels);
+            springToCenterX = newSpringToCenterX;
+            springToCenterY = newSpringToCenterY;
+            value = Vector2.zero;
+            UpdateHandle();
+        }
+
         private void Awake()
         {
             rectTransform = (RectTransform)transform;

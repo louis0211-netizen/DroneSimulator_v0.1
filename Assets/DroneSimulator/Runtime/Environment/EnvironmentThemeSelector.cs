@@ -17,6 +17,26 @@ namespace DroneSimulator.Environment
 
         private EnvironmentTheme currentTheme;
 
+        public void Configure(
+            TrainingGroundBuilder builder,
+            FlightTrainingSession session,
+            Text current,
+            Text city,
+            Text forest,
+            Text mountain,
+            Text beach)
+        {
+            trainingGroundBuilder = builder;
+            trainingSession = session;
+            currentThemeText = current;
+            cityButtonText = city;
+            forestButtonText = forest;
+            mountainButtonText = mountain;
+            beachButtonText = beach;
+            currentTheme = trainingGroundBuilder != null ? trainingGroundBuilder.CurrentTheme : EnvironmentTheme.City;
+            UpdateLabels();
+        }
+
         private void Awake()
         {
             ResolveReferences();

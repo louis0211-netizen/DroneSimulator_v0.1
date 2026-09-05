@@ -1,5 +1,6 @@
 using DroneSimulator.Camera;
 using DroneSimulator.Core;
+using DroneSimulator.HUD;
 using DroneSimulator.Input;
 using UnityEngine;
 using UnityEngine.UI;
@@ -51,6 +52,7 @@ namespace DroneSimulator.Systems
         private void Awake()
         {
             ResolveReferences();
+            MobileHudRuntimeBuilder.Ensure(this);
             currentStep = TrainingStep.Arm;
         }
 
@@ -80,6 +82,22 @@ namespace DroneSimulator.Systems
             {
                 batterySimulator.ResetBattery();
             }
+        }
+
+        public void ConfigureHudControls(
+            Text newObjectiveText,
+            Text newWarningText,
+            Text newArmButtonText,
+            Text newResetButtonText,
+            Text newCameraButtonText,
+            Text newModeButtonText)
+        {
+            objectiveText = newObjectiveText;
+            warningText = newWarningText;
+            armButtonText = newArmButtonText;
+            resetButtonText = newResetButtonText;
+            cameraButtonText = newCameraButtonText;
+            modeButtonText = newModeButtonText;
         }
 
         private void ResolveReferences()

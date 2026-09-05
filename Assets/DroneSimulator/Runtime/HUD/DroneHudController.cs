@@ -16,6 +16,26 @@ namespace DroneSimulator.HUD
         [SerializeField] private Text flightModeText;
         [SerializeField] private Text batteryText;
 
+        public void Configure(
+            DronePhysics physics,
+            FlightController controller,
+            BatterySimulator battery,
+            Text altitude,
+            Text speed,
+            Text flightTime,
+            Text flightMode,
+            Text batteryDisplay)
+        {
+            dronePhysics = physics;
+            flightController = controller;
+            batterySimulator = battery;
+            altitudeText = altitude;
+            speedText = speed;
+            flightTimeText = flightTime;
+            flightModeText = flightMode;
+            batteryText = batteryDisplay;
+        }
+
         private void Update()
         {
             if (dronePhysics == null || flightController == null)

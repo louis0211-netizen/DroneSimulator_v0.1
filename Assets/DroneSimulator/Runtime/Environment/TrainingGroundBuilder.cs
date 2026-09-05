@@ -84,6 +84,7 @@ namespace DroneSimulator.Environment
             CreateObstacle(root, "Concrete Barrier", new Vector3(6f, 0.45f, 6f), new Vector3(2.5f, 0.9f, 0.55f), new Color(0.56f, 0.61f, 0.64f));
             CreateObstacle(root, "Container", new Vector3(-7f, 0.7f, 5f), new Vector3(3.5f, 1.4f, 1.4f), new Color(0.72f, 0.2f, 0.12f));
             CreateHorizonBlocks(root, new Color(0.18f, 0.2f, 0.23f));
+            CreateBackdrop(root, EnvironmentTheme.City, new Color(0.72f, 0.78f, 0.82f));
         }
 
         private void BuildForest(Transform root)
@@ -110,6 +111,7 @@ namespace DroneSimulator.Environment
             CreateLog(root, new Vector3(-6f, 0.35f, 7f), 22f);
             CreateLog(root, new Vector3(6f, 0.35f, 12f), -38f);
             CreateObstacle(root, "Rock", new Vector3(3.8f, 0.55f, 5.5f), new Vector3(1.3f, 1.1f, 1.1f), new Color(0.36f, 0.35f, 0.31f));
+            CreateBackdrop(root, EnvironmentTheme.Forest, new Color(0.72f, 0.84f, 0.74f));
         }
 
         private void BuildMountain(Transform root)
@@ -128,6 +130,7 @@ namespace DroneSimulator.Environment
             CreateObstacle(root, "Cliff Pillar", new Vector3(6.5f, 1.8f, 8.5f), new Vector3(2.1f, 3.6f, 1.8f), new Color(0.27f, 0.28f, 0.27f));
             CreateObstacle(root, "Cliff Pillar", new Vector3(-7f, 1.45f, 12f), new Vector3(1.7f, 2.9f, 1.5f), new Color(0.34f, 0.34f, 0.31f));
             CreateObstacle(root, "Snow Marker", new Vector3(0f, 0.08f, -10f), new Vector3(16f, 0.08f, 1.5f), new Color(0.82f, 0.88f, 0.9f));
+            CreateBackdrop(root, EnvironmentTheme.Mountain, new Color(0.78f, 0.84f, 0.9f));
         }
 
         private void BuildBeach(Transform root)
@@ -147,6 +150,7 @@ namespace DroneSimulator.Environment
             CreateObstacle(root, "Beach Rock", new Vector3(6f, 0.45f, 6f), new Vector3(1.6f, 0.9f, 1.2f), new Color(0.38f, 0.35f, 0.31f));
             CreateBuoy(root, new Vector3(-4f, 0.28f, 24f), new Color(0.95f, 0.18f, 0.12f));
             CreateBuoy(root, new Vector3(4f, 0.28f, 27f), new Color(0.95f, 0.95f, 0.2f));
+            CreateBackdrop(root, EnvironmentTheme.Beach, new Color(0.78f, 0.88f, 0.96f));
         }
 
         private void CreateGround(Transform root, string name, Color color, Vector3 scale)
@@ -475,6 +479,57 @@ namespace DroneSimulator.Environment
 
             Material material = new Material(shader);
             material.color = color;
+            return material;
+        }
+
+        private static void CreateBackdrop(Transform root, EnvironmentTheme theme, Color tint)
+        {
+            Texture2D texture = LoadBackdropTexture(theme);
+            if (texture == null)
+            {
+                return;
+            }
+
+            GameObject backdrop = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            backdrop.name = theme + " Photo Backdrop";
+            backdrop.transform.SetParent(root);
+            backdrop.transform.localPosition = new Vector3(0f, 8.5f, 37f);
+            backdrop.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
+            backdrop.transform.localScale = new Vector3(44f, 16f, 1f);
+
+            Renderer renderer = backdrop.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                renderer.sharedMaterial = CreateTexturedMaterial(texture, tint);
+            }
+        }
+
+        private static Texture2D LoadBackdropTexture(EnvironmentTheme theme)
+        {
+            switch (theme)
+            {
+                case EnvironmentTheme.Forest:
+                    return Resources.Load<Texture2D>("EnvironmentBackdrops/forest_hochsal_forest");
+                case EnvironmentTheme.Mountain:
+                    return Resources.Load<Texture2D>("EnvironmentBackdrops/mountain_table_mountain_2");
+                case EnvironmentTheme.Beach:
+                    return Resources.Load<Texture2D>("EnvironmentBackdrops/beach_umhlanga_sunrise");
+                default:
+                    return Resources.Load<Texture2D>("EnvironmentBackdrops/city_wide_street_02");
+            }
+        }
+
+        private static Material CreateTexturedMaterial(Texture texture, Color tint)
+        {
+            Shader shader = Shader.Find("Unlit/Texture");
+            if (shader == null)
+            {
+                shader = Shader.Find("Standard");
+            }
+
+            Material material = new Material(shader);
+            material.color = tint;
+            material.mainTexture = texture;
             return material;
         }
     }

@@ -43,6 +43,7 @@ namespace DroneSimulator.Environment
             GameObject root = new GameObject(theme + " Training Ground");
             root.transform.SetParent(transform);
             activeThemeRoot = root.transform;
+            CreatePanoramaEnvironment(activeThemeRoot, theme);
 
             switch (theme)
             {
@@ -84,7 +85,6 @@ namespace DroneSimulator.Environment
             CreateObstacle(root, "Concrete Barrier", new Vector3(6f, 0.45f, 6f), new Vector3(2.5f, 0.9f, 0.55f), new Color(0.56f, 0.61f, 0.64f));
             CreateObstacle(root, "Container", new Vector3(-7f, 0.7f, 5f), new Vector3(3.5f, 1.4f, 1.4f), new Color(0.72f, 0.2f, 0.12f));
             CreateHorizonBlocks(root, new Color(0.18f, 0.2f, 0.23f));
-            CreateBackdrop(root, EnvironmentTheme.City, new Color(0.72f, 0.78f, 0.82f));
         }
 
         private void BuildForest(Transform root)
@@ -111,7 +111,6 @@ namespace DroneSimulator.Environment
             CreateLog(root, new Vector3(-6f, 0.35f, 7f), 22f);
             CreateLog(root, new Vector3(6f, 0.35f, 12f), -38f);
             CreateObstacle(root, "Rock", new Vector3(3.8f, 0.55f, 5.5f), new Vector3(1.3f, 1.1f, 1.1f), new Color(0.36f, 0.35f, 0.31f));
-            CreateBackdrop(root, EnvironmentTheme.Forest, new Color(0.72f, 0.84f, 0.74f));
         }
 
         private void BuildMountain(Transform root)
@@ -130,7 +129,6 @@ namespace DroneSimulator.Environment
             CreateObstacle(root, "Cliff Pillar", new Vector3(6.5f, 1.8f, 8.5f), new Vector3(2.1f, 3.6f, 1.8f), new Color(0.27f, 0.28f, 0.27f));
             CreateObstacle(root, "Cliff Pillar", new Vector3(-7f, 1.45f, 12f), new Vector3(1.7f, 2.9f, 1.5f), new Color(0.34f, 0.34f, 0.31f));
             CreateObstacle(root, "Snow Marker", new Vector3(0f, 0.08f, -10f), new Vector3(16f, 0.08f, 1.5f), new Color(0.82f, 0.88f, 0.9f));
-            CreateBackdrop(root, EnvironmentTheme.Mountain, new Color(0.78f, 0.84f, 0.9f));
         }
 
         private void BuildBeach(Transform root)
@@ -150,7 +148,6 @@ namespace DroneSimulator.Environment
             CreateObstacle(root, "Beach Rock", new Vector3(6f, 0.45f, 6f), new Vector3(1.6f, 0.9f, 1.2f), new Color(0.38f, 0.35f, 0.31f));
             CreateBuoy(root, new Vector3(-4f, 0.28f, 24f), new Color(0.95f, 0.18f, 0.12f));
             CreateBuoy(root, new Vector3(4f, 0.28f, 27f), new Color(0.95f, 0.95f, 0.2f));
-            CreateBackdrop(root, EnvironmentTheme.Beach, new Color(0.78f, 0.88f, 0.96f));
         }
 
         private void CreateGround(Transform root, string name, Color color, Vector3 scale)
@@ -329,25 +326,25 @@ namespace DroneSimulator.Environment
                 case EnvironmentTheme.Forest:
                     skyColor = new Color(0.42f, 0.56f, 0.5f);
                     fogColor = new Color(0.18f, 0.28f, 0.22f);
-                    fogDensity = 0.012f;
+                    fogDensity = 0.002f;
                     RenderSettings.ambientLight = new Color(0.42f, 0.48f, 0.4f);
                     break;
                 case EnvironmentTheme.Mountain:
                     skyColor = new Color(0.52f, 0.62f, 0.72f);
                     fogColor = new Color(0.5f, 0.56f, 0.6f);
-                    fogDensity = 0.009f;
+                    fogDensity = 0.0015f;
                     RenderSettings.ambientLight = new Color(0.5f, 0.5f, 0.48f);
                     break;
                 case EnvironmentTheme.Beach:
                     skyColor = new Color(0.48f, 0.68f, 0.82f);
                     fogColor = new Color(0.62f, 0.72f, 0.74f);
-                    fogDensity = 0.006f;
+                    fogDensity = 0.001f;
                     RenderSettings.ambientLight = new Color(0.62f, 0.58f, 0.48f);
                     break;
                 default:
                     skyColor = new Color(0.28f, 0.38f, 0.46f);
                     fogColor = new Color(0.22f, 0.25f, 0.28f);
-                    fogDensity = 0.008f;
+                    fogDensity = 0.0015f;
                     RenderSettings.ambientLight = new Color(0.44f, 0.45f, 0.46f);
                     break;
             }
@@ -482,29 +479,45 @@ namespace DroneSimulator.Environment
             return material;
         }
 
-        private static void CreateBackdrop(Transform root, EnvironmentTheme theme, Color tint)
+        private static void CreatePanoramaEnvironment(Transform root, EnvironmentTheme theme)
         {
-            Texture2D texture = LoadBackdropTexture(theme);
+            Texture2D texture = LoadPanoramaTexture(theme);
+            if (texture == null)
+            {
+                texture = LoadPreviewTexture(theme);
+            }
+
             if (texture == null)
             {
                 return;
             }
 
-            GameObject backdrop = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            backdrop.name = theme + " Photo Backdrop";
-            backdrop.transform.SetParent(root);
-            backdrop.transform.localPosition = new Vector3(0f, 8.5f, 37f);
-            backdrop.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
-            backdrop.transform.localScale = new Vector3(44f, 16f, 1f);
+            GameObject panorama = new GameObject(theme + " 360 Photo Environment");
+            panorama.transform.SetParent(root);
+            panorama.transform.localPosition = new Vector3(0f, 1.15f, 0f);
 
-            Renderer renderer = backdrop.GetComponent<Renderer>();
-            if (renderer != null)
+            MeshFilter meshFilter = panorama.AddComponent<MeshFilter>();
+            MeshRenderer meshRenderer = panorama.AddComponent<MeshRenderer>();
+            meshFilter.sharedMesh = CreateInsideOutSphereMesh(48, 24, 88f);
+            meshRenderer.sharedMaterial = CreateTexturedMaterial(texture, Color.white);
+        }
+
+        private static Texture2D LoadPanoramaTexture(EnvironmentTheme theme)
+        {
+            switch (theme)
             {
-                renderer.sharedMaterial = CreateTexturedMaterial(texture, tint);
+                case EnvironmentTheme.Forest:
+                    return Resources.Load<Texture2D>("EnvironmentPanoramas/forest_hochsal_forest");
+                case EnvironmentTheme.Mountain:
+                    return Resources.Load<Texture2D>("EnvironmentPanoramas/mountain_table_mountain_2");
+                case EnvironmentTheme.Beach:
+                    return Resources.Load<Texture2D>("EnvironmentPanoramas/beach_umhlanga_sunrise");
+                default:
+                    return Resources.Load<Texture2D>("EnvironmentPanoramas/city_wide_street_02");
             }
         }
 
-        private static Texture2D LoadBackdropTexture(EnvironmentTheme theme)
+        private static Texture2D LoadPreviewTexture(EnvironmentTheme theme)
         {
             switch (theme)
             {
@@ -531,6 +544,61 @@ namespace DroneSimulator.Environment
             material.color = tint;
             material.mainTexture = texture;
             return material;
+        }
+
+        private static Mesh CreateInsideOutSphereMesh(int longitudeSegments, int latitudeSegments, float radius)
+        {
+            int safeLongitudeSegments = Mathf.Max(16, longitudeSegments);
+            int safeLatitudeSegments = Mathf.Max(8, latitudeSegments);
+            Vector3[] vertices = new Vector3[(safeLongitudeSegments + 1) * (safeLatitudeSegments + 1)];
+            Vector2[] uv = new Vector2[vertices.Length];
+            int[] triangles = new int[safeLongitudeSegments * safeLatitudeSegments * 6];
+
+            int vertexIndex = 0;
+            for (int y = 0; y <= safeLatitudeSegments; y++)
+            {
+                float v = y / (float)safeLatitudeSegments;
+                float phi = Mathf.PI * v;
+                float sinPhi = Mathf.Sin(phi);
+                float cosPhi = Mathf.Cos(phi);
+
+                for (int x = 0; x <= safeLongitudeSegments; x++)
+                {
+                    float u = x / (float)safeLongitudeSegments;
+                    float theta = Mathf.PI * 2f * u;
+                    vertices[vertexIndex] = new Vector3(
+                        Mathf.Sin(theta) * sinPhi * radius,
+                        cosPhi * radius,
+                        Mathf.Cos(theta) * sinPhi * radius);
+                    uv[vertexIndex] = new Vector2(1f - u, 1f - v);
+                    vertexIndex++;
+                }
+            }
+
+            int triangleIndex = 0;
+            for (int y = 0; y < safeLatitudeSegments; y++)
+            {
+                for (int x = 0; x < safeLongitudeSegments; x++)
+                {
+                    int current = y * (safeLongitudeSegments + 1) + x;
+                    int next = current + safeLongitudeSegments + 1;
+
+                    triangles[triangleIndex++] = current;
+                    triangles[triangleIndex++] = next + 1;
+                    triangles[triangleIndex++] = next;
+                    triangles[triangleIndex++] = current;
+                    triangles[triangleIndex++] = current + 1;
+                    triangles[triangleIndex++] = next + 1;
+                }
+            }
+
+            Mesh mesh = new Mesh();
+            mesh.vertices = vertices;
+            mesh.uv = uv;
+            mesh.triangles = triangles;
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            return mesh;
         }
     }
 }

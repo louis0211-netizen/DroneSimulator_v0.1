@@ -117,10 +117,10 @@ namespace DroneSimulator.HUD
 
             EnvironmentThemeSelector selector = canvasObject.AddComponent<EnvironmentThemeSelector>();
             Text currentTheme = CreateThemeTitle(safeRoot);
-            Text cityLabel = CreateThemeButton(safeRoot, new Vector2(-258f, 174f), UiIconType.City, "CITY", selector.SelectCity);
-            Text forestLabel = CreateThemeButton(safeRoot, new Vector2(-86f, 174f), UiIconType.Forest, "FOREST", selector.SelectForest);
-            Text mountainLabel = CreateThemeButton(safeRoot, new Vector2(86f, 174f), UiIconType.Mountain, "MTN", selector.SelectMountain);
-            Text beachLabel = CreateThemeButton(safeRoot, new Vector2(258f, 174f), UiIconType.Beach, "BEACH", selector.SelectBeach);
+            Text cityLabel = CreateThemeButton(safeRoot, new Vector2(-294f, 174f), UiIconType.City, "CITY", selector.SelectCity);
+            Text forestLabel = CreateThemeButton(safeRoot, new Vector2(-98f, 174f), UiIconType.Forest, "FOREST", selector.SelectForest);
+            Text mountainLabel = CreateThemeButton(safeRoot, new Vector2(98f, 174f), UiIconType.Mountain, "MTN", selector.SelectMountain);
+            Text beachLabel = CreateThemeButton(safeRoot, new Vector2(294f, 174f), UiIconType.Beach, "BEACH", selector.SelectBeach);
             selector.Configure(groundBuilder, trainingSession, currentTheme, cityLabel, forestLabel, mountainLabel, beachLabel);
 
             if (trainingSession != null)
@@ -187,7 +187,7 @@ namespace DroneSimulator.HUD
             rect.anchorMin = new Vector2(0.5f, 0f);
             rect.anchorMax = new Vector2(0.5f, 0f);
             rect.pivot = new Vector2(0.5f, 0.5f);
-            rect.anchoredPosition = new Vector2(0f, 240f);
+            rect.anchoredPosition = new Vector2(0f, 247f);
             rect.sizeDelta = new Vector2(360f, 30f);
             return text;
         }
@@ -209,15 +209,15 @@ namespace DroneSimulator.HUD
 
         private static Text CreateThemeButton(RectTransform parent, Vector2 position, UiIconType iconType, string label, UnityEngine.Events.UnityAction action)
         {
-            RectTransform rect = CreateButtonRoot("Theme " + label, parent, position, new Vector2(138f, 72f));
-            AddIcon(rect, iconType, new Vector2(-34f, 1f), new Vector2(34f, 34f), new Color(0.56f, 0.92f, 0.78f, 0.98f));
+            RectTransform rect = CreateButtonRoot("Theme " + label, parent, position, new Vector2(162f, 72f));
+            AddIcon(rect, iconType, new Vector2(-43f, 1f), new Vector2(34f, 34f), new Color(0.56f, 0.92f, 0.78f, 0.98f));
             Text text = CreateText(label + " Label", rect, label, 17, new Color(0.9f, 0.96f, 0.94f, 0.95f), TextAnchor.MiddleCenter);
             RectTransform labelRect = (RectTransform)text.transform;
             labelRect.anchorMin = new Vector2(0.5f, 0.5f);
             labelRect.anchorMax = new Vector2(0.5f, 0.5f);
             labelRect.pivot = new Vector2(0.5f, 0.5f);
-            labelRect.anchoredPosition = new Vector2(24f, 0f);
-            labelRect.sizeDelta = new Vector2(76f, 24f);
+            labelRect.anchoredPosition = new Vector2(27f, 0f);
+            labelRect.sizeDelta = new Vector2(96f, 24f);
             rect.gameObject.GetComponent<Button>().onClick.AddListener(action);
             return text;
         }

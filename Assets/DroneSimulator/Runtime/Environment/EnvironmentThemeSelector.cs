@@ -106,8 +106,7 @@ namespace DroneSimulator.Environment
 
         private void SetButtonText(Text target, EnvironmentTheme theme)
         {
-            string prefix = currentTheme == theme ? "> " : string.Empty;
-            SetText(target, prefix + GetDisplayName(theme).ToUpperInvariant());
+            SetText(target, GetShortDisplayName(theme));
         }
 
         private static string GetDisplayName(EnvironmentTheme theme)
@@ -124,6 +123,23 @@ namespace DroneSimulator.Environment
                     return "Beach";
                 default:
                     return "Unknown";
+            }
+        }
+
+        private static string GetShortDisplayName(EnvironmentTheme theme)
+        {
+            switch (theme)
+            {
+                case EnvironmentTheme.City:
+                    return "CITY";
+                case EnvironmentTheme.Forest:
+                    return "FOREST";
+                case EnvironmentTheme.Mountain:
+                    return "MTN";
+                case EnvironmentTheme.Beach:
+                    return "BEACH";
+                default:
+                    return "ENV";
             }
         }
 

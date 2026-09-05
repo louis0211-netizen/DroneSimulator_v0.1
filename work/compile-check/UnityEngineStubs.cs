@@ -186,6 +186,7 @@ namespace UnityEngine
     public class Mesh : Object
     {
         public Vector3[] vertices;
+        public Vector2[] uv;
         public int[] triangles;
         public void RecalculateNormals() { }
         public void RecalculateBounds() { }

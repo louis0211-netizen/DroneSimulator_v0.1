@@ -32,7 +32,7 @@ namespace DroneSimulator.Editor
             FlightTrainingSession trainingSession = systems.AddComponent<FlightTrainingSession>();
 
             GameObject environment = new GameObject("Training Ground Builder");
-            environment.AddComponent<TrainingGroundBuilder>();
+            TrainingGroundBuilder trainingGroundBuilder = environment.AddComponent<TrainingGroundBuilder>();
 
             GameObject drone = CreateDrone(preset);
             DroneInputManager inputManager = drone.GetComponent<DroneInputManager>();
@@ -41,7 +41,7 @@ namespace DroneSimulator.Editor
             BatterySimulator batterySimulator = drone.GetComponent<BatterySimulator>();
 
             DroneCameraRig cameraRig = CreateCameraRig(drone.transform);
-            CreateHudAndControls(inputManager, flightController, dronePhysics, batterySimulator, cameraRig, trainingSession);
+            CreateHudAndControls(inputManager, flightController, dronePhysics, batterySimulator, cameraRig, trainingSession, trainingGroundBuilder);
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             IosBuildConfigurator.EnsureSceneIsInBuildSettings();
@@ -140,7 +140,8 @@ namespace DroneSimulator.Editor
             DronePhysics dronePhysics,
             BatterySimulator batterySimulator,
             DroneCameraRig cameraRig,
-            FlightTrainingSession trainingSession)
+            FlightTrainingSession trainingSession,
+            TrainingGroundBuilder trainingGroundBuilder)
         {
             GameObject eventSystem = new GameObject("EventSystem");
             eventSystem.AddComponent<EventSystem>();
@@ -172,27 +173,29 @@ namespace DroneSimulator.Editor
             VirtualJoystick leftJoystick = CreateJoystick(
                 safeArea.transform,
                 "Left Stick Throttle/Yaw",
-                new Vector2(220f, 220f),
+                new Vector2(240f, 230f),
                 new Vector2(0f, 0f),
                 false);
             VirtualJoystick rightJoystick = CreateJoystick(
                 safeArea.transform,
                 "Right Stick Pitch/Roll",
-                new Vector2(-220f, 220f),
+                new Vector2(-240f, 230f),
                 new Vector2(1f, 0f),
                 true);
             SetObject(inputManager, "leftJoystick", leftJoystick);
             SetObject(inputManager, "rightJoystick", rightJoystick);
 
             DroneHudController hud = CreateHud(safeArea.transform, dronePhysics, flightController, batterySimulator);
-            Text objectiveText = CreateTopCenterText(safeArea.transform, "Objective", new Vector2(0f, -34f), 42);
-            Text warningText = CreateTopCenterText(safeArea.transform, "Warning", new Vector2(0f, -82f), 32);
+            Text objectiveText = CreateTopCenterText(safeArea.transform, "Objective", new Vector2(0f, -44f), 30);
+            Text warningText = CreateTopCenterText(safeArea.transform, "Warning", new Vector2(0f, -86f), 26);
             warningText.color = new Color(1f, 0.42f, 0.26f, 1f);
 
-            UiButton armButton = CreateButton(safeArea.transform, "ARM", new Vector2(0f, 118f));
-            UiButton resetButton = CreateButton(safeArea.transform, "RESET", new Vector2(0f, 48f));
-            UiButton cameraButton = CreateButton(safeArea.transform, "FPV", new Vector2(0f, -22f));
-            UiButton modeButton = CreateButton(safeArea.transform, "STABILIZED", new Vector2(0f, -92f));
+            CreateControlRail(safeArea.transform);
+            UiButton armButton = CreateButton(safeArea.transform, "ARM", new Vector2(-168f, 240f), new Vector2(1f, 0.5f), new Vector2(0.5f, 0.5f), new Color(0.11f, 0.56f, 0.64f, 0.86f));
+            UiButton resetButton = CreateButton(safeArea.transform, "RESET", new Vector2(-168f, 170f), new Vector2(1f, 0.5f), new Vector2(0.5f, 0.5f), new Color(0.16f, 0.18f, 0.2f, 0.86f));
+            UiButton cameraButton = CreateButton(safeArea.transform, "FPV", new Vector2(-168f, 100f), new Vector2(1f, 0.5f), new Vector2(0.5f, 0.5f), new Color(0.16f, 0.18f, 0.2f, 0.86f));
+            UiButton modeButton = CreateButton(safeArea.transform, "STABILIZED", new Vector2(-168f, 30f), new Vector2(1f, 0.5f), new Vector2(0.5f, 0.5f), new Color(0.16f, 0.18f, 0.2f, 0.86f));
+            CreateEnvironmentSelector(safeArea.transform, trainingGroundBuilder, trainingSession);
 
             UnityEventTools.AddPersistentListener(armButton.button.onClick, inputManager.QueueArmToggle);
             UnityEventTools.AddPersistentListener(resetButton.button.onClick, inputManager.QueueReset);
@@ -217,13 +220,23 @@ namespace DroneSimulator.Editor
 
         private static VirtualJoystick CreateJoystick(Transform parent, string name, Vector2 anchoredPosition, Vector2 anchor, bool springY)
         {
-            GameObject root = CreateUiRect(parent, name, anchoredPosition, new Vector2(260f, 260f), anchor, new Vector2(0.5f, 0.5f));
-            Image baseImage = root.AddComponent<Image>();
-            baseImage.color = new Color(1f, 1f, 1f, 0.16f);
+            GameObject root = CreateUiRect(parent, name, anchoredPosition, new Vector2(300f, 300f), anchor, new Vector2(0.5f, 0.5f));
+            UiRingGraphic baseRing = root.AddComponent<UiRingGraphic>();
+            baseRing.color = new Color(0.62f, 0.86f, 1f, 0.28f);
+            baseRing.InnerRadius = 0.72f;
 
-            GameObject handle = CreateUiRect(root.transform, "Handle", Vector2.zero, new Vector2(92f, 92f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
-            Image handleImage = handle.AddComponent<Image>();
-            handleImage.color = new Color(1f, 1f, 1f, 0.42f);
+            GameObject inner = CreateUiRect(root.transform, "Inner Stick Guide", Vector2.zero, new Vector2(176f, 176f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
+            UiRingGraphic innerRing = inner.AddComponent<UiRingGraphic>();
+            innerRing.color = new Color(1f, 1f, 1f, 0.08f);
+            innerRing.InnerRadius = 0.92f;
+
+            GameObject handle = CreateUiRect(root.transform, "Handle", Vector2.zero, new Vector2(96f, 96f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
+            UiRingGraphic handleImage = handle.AddComponent<UiRingGraphic>();
+            handleImage.color = new Color(0.88f, 0.96f, 1f, 0.52f);
+            handleImage.InnerRadius = 0f;
+
+            Text label = CreateCenteredText(root.transform, name.Contains("Throttle") ? "THR / YAW" : "PITCH / ROLL", new Vector2(0f, -184f), new Vector2(260f, 30f), 18);
+            label.color = new Color(0.8f, 0.92f, 1f, 0.72f);
 
             VirtualJoystick joystick = root.AddComponent<VirtualJoystick>();
             SetObject(joystick, "handle", handle.GetComponent<RectTransform>());
@@ -238,13 +251,15 @@ namespace DroneSimulator.Editor
             BatterySimulator batterySimulator)
         {
             GameObject hudObject = CreateUiRect(parent, "HUD", new Vector2(32f, -32f), new Vector2(520f, 220f), new Vector2(0f, 1f), new Vector2(0f, 1f));
+            Image panel = hudObject.AddComponent<Image>();
+            panel.color = new Color(0.03f, 0.07f, 0.09f, 0.52f);
             DroneHudController hud = hudObject.AddComponent<DroneHudController>();
 
-            Text altitude = CreateText(hudObject.transform, "Altitude", new Vector2(0f, 0f));
-            Text speed = CreateText(hudObject.transform, "Speed", new Vector2(0f, -36f));
-            Text time = CreateText(hudObject.transform, "Flight Time", new Vector2(0f, -72f));
-            Text mode = CreateText(hudObject.transform, "Flight Mode", new Vector2(0f, -108f));
-            Text battery = CreateText(hudObject.transform, "Battery", new Vector2(0f, -144f));
+            Text altitude = CreateText(hudObject.transform, "Altitude", new Vector2(22f, -18f));
+            Text speed = CreateText(hudObject.transform, "Speed", new Vector2(22f, -54f));
+            Text time = CreateText(hudObject.transform, "Flight Time", new Vector2(22f, -90f));
+            Text mode = CreateText(hudObject.transform, "Flight Mode", new Vector2(22f, -126f));
+            Text battery = CreateText(hudObject.transform, "Battery", new Vector2(22f, -162f));
 
             SetObject(hud, "dronePhysics", dronePhysics);
             SetObject(hud, "flightController", flightController);
@@ -258,14 +273,21 @@ namespace DroneSimulator.Editor
             return hud;
         }
 
-        private static UiButton CreateButton(Transform parent, string label, Vector2 anchoredPosition)
+        private static void CreateControlRail(Transform parent)
         {
-            GameObject buttonObject = CreateUiRect(parent, label + " Button", anchoredPosition, new Vector2(210f, 56f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
+            GameObject rail = CreateUiRect(parent, "Flight Control Rail", new Vector2(-168f, 135f), new Vector2(250f, 330f), new Vector2(1f, 0.5f), new Vector2(0.5f, 0.5f));
+            Image image = rail.AddComponent<Image>();
+            image.color = new Color(0.02f, 0.03f, 0.04f, 0.22f);
+        }
+
+        private static UiButton CreateButton(Transform parent, string label, Vector2 anchoredPosition, Vector2 anchor, Vector2 pivot, Color color)
+        {
+            GameObject buttonObject = CreateUiRect(parent, label + " Button", anchoredPosition, new Vector2(210f, 58f), anchor, pivot);
             Image image = buttonObject.AddComponent<Image>();
-            image.color = new Color(0.08f, 0.09f, 0.1f, 0.82f);
+            image.color = color;
             Button button = buttonObject.AddComponent<Button>();
 
-            Text text = CreateText(buttonObject.transform, label + " Label", Vector2.zero);
+            Text text = CreateCenteredText(buttonObject.transform, label + " Label", Vector2.zero, new Vector2(210f, 58f), 22);
             RectTransform textRect = text.GetComponent<RectTransform>();
             textRect.anchorMin = Vector2.zero;
             textRect.anchorMax = Vector2.one;
@@ -277,13 +299,57 @@ namespace DroneSimulator.Editor
             return new UiButton(button, text);
         }
 
+        private static void CreateEnvironmentSelector(Transform parent, TrainingGroundBuilder trainingGroundBuilder, FlightTrainingSession trainingSession)
+        {
+            GameObject panel = CreateUiRect(parent, "Environment Selector", new Vector2(-32f, -32f), new Vector2(600f, 148f), new Vector2(1f, 1f), new Vector2(1f, 1f));
+            Image panelImage = panel.AddComponent<Image>();
+            panelImage.color = new Color(0.03f, 0.07f, 0.09f, 0.48f);
+
+            EnvironmentThemeSelector selector = panel.AddComponent<EnvironmentThemeSelector>();
+            Text currentTheme = CreateText(panel.transform, "Current Environment", new Vector2(20f, -14f));
+            currentTheme.fontSize = 19;
+            currentTheme.color = new Color(0.7f, 0.9f, 1f, 0.9f);
+
+            UiButton city = CreateButton(panel.transform, "CITY", new Vector2(20f, -68f), new Vector2(0f, 1f), new Vector2(0f, 0.5f), new Color(0.11f, 0.16f, 0.19f, 0.8f));
+            UiButton forest = CreateButton(panel.transform, "FOREST", new Vector2(164f, -68f), new Vector2(0f, 1f), new Vector2(0f, 0.5f), new Color(0.1f, 0.22f, 0.13f, 0.8f));
+            UiButton mountain = CreateButton(panel.transform, "MOUNTAIN", new Vector2(308f, -68f), new Vector2(0f, 1f), new Vector2(0f, 0.5f), new Color(0.18f, 0.18f, 0.17f, 0.8f));
+            UiButton beach = CreateButton(panel.transform, "BEACH", new Vector2(452f, -68f), new Vector2(0f, 1f), new Vector2(0f, 0.5f), new Color(0.14f, 0.31f, 0.37f, 0.8f));
+
+            RectTransform cityRect = city.button.GetComponent<RectTransform>();
+            RectTransform forestRect = forest.button.GetComponent<RectTransform>();
+            RectTransform mountainRect = mountain.button.GetComponent<RectTransform>();
+            RectTransform beachRect = beach.button.GetComponent<RectTransform>();
+            cityRect.sizeDelta = new Vector2(130f, 48f);
+            forestRect.sizeDelta = new Vector2(130f, 48f);
+            mountainRect.sizeDelta = new Vector2(130f, 48f);
+            beachRect.sizeDelta = new Vector2(130f, 48f);
+
+            city.label.fontSize = 18;
+            forest.label.fontSize = 18;
+            mountain.label.fontSize = 17;
+            beach.label.fontSize = 18;
+
+            UnityEventTools.AddPersistentListener(city.button.onClick, selector.SelectCity);
+            UnityEventTools.AddPersistentListener(forest.button.onClick, selector.SelectForest);
+            UnityEventTools.AddPersistentListener(mountain.button.onClick, selector.SelectMountain);
+            UnityEventTools.AddPersistentListener(beach.button.onClick, selector.SelectBeach);
+
+            SetObject(selector, "trainingGroundBuilder", trainingGroundBuilder);
+            SetObject(selector, "trainingSession", trainingSession);
+            SetObject(selector, "currentThemeText", currentTheme);
+            SetObject(selector, "cityButtonText", city.label);
+            SetObject(selector, "forestButtonText", forest.label);
+            SetObject(selector, "mountainButtonText", mountain.label);
+            SetObject(selector, "beachButtonText", beach.label);
+        }
+
         private static Text CreateText(Transform parent, string name, Vector2 anchoredPosition)
         {
             GameObject textObject = CreateUiRect(parent, name, anchoredPosition, new Vector2(500f, 32f), new Vector2(0f, 1f), new Vector2(0f, 1f));
             Text text = textObject.AddComponent<Text>();
             text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            text.fontSize = 24;
-            text.color = Color.white;
+            text.fontSize = 22;
+            text.color = new Color(0.88f, 0.96f, 1f, 0.95f);
             text.alignment = TextAnchor.MiddleLeft;
             text.raycastTarget = false;
             text.text = name;
@@ -293,6 +359,19 @@ namespace DroneSimulator.Editor
         private static Text CreateTopCenterText(Transform parent, string name, Vector2 anchoredPosition, int fontSize)
         {
             GameObject textObject = CreateUiRect(parent, name, anchoredPosition, new Vector2(980f, 44f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
+            Text text = textObject.AddComponent<Text>();
+            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            text.fontSize = fontSize;
+            text.color = Color.white;
+            text.alignment = TextAnchor.MiddleCenter;
+            text.raycastTarget = false;
+            text.text = name;
+            return text;
+        }
+
+        private static Text CreateCenteredText(Transform parent, string name, Vector2 anchoredPosition, Vector2 size, int fontSize)
+        {
+            GameObject textObject = CreateUiRect(parent, name, anchoredPosition, size, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
             Text text = textObject.AddComponent<Text>();
             text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             text.fontSize = fontSize;

@@ -67,6 +67,21 @@ namespace DroneSimulator.Systems
             stepTimer = 0f;
         }
 
+        public void RestartTrainingAndDrone()
+        {
+            RestartTraining();
+
+            if (dronePhysics != null)
+            {
+                dronePhysics.ResetDrone();
+            }
+
+            if (batterySimulator != null)
+            {
+                batterySimulator.ResetBattery();
+            }
+        }
+
         private void ResolveReferences()
         {
             if (dronePhysics == null)

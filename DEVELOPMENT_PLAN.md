@@ -126,6 +126,13 @@ Status:
 - Obstacles
 - Reset spawn point
 
+Status:
+
+- Runtime-generated training environments are implemented.
+- City, Forest, Mountain, and Beach themes can be selected from the in-game HUD.
+- Each theme rebuilds the training ground, updates atmosphere/fog/light color, and resets the drone/training loop.
+- Visuals are still lightweight primitive geometry for fast iPhone testing; next pass should replace key props with optimized mobile meshes/materials.
+
 ## Later Architecture
 
 - PID tuning UI

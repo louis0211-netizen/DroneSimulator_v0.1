@@ -5,10 +5,13 @@ namespace UnityEngine
     public class Object
     {
         public static T FindFirstObjectByType<T>() where T : Object => default(T);
+        public static T[] FindObjectsByType<T>(FindObjectsSortMode sortMode) where T : Object => new T[0];
+        public static void Destroy(Object obj) { }
     }
     public class Component : Object
     {
         public Transform transform { get; } = new Transform();
+        public GameObject gameObject { get; } = new GameObject();
         public T GetComponent<T>() { return default(T); }
         public T GetComponentInParent<T>() { return default(T); }
     }
@@ -51,6 +54,9 @@ namespace UnityEngine
     {
         public Vector2 position;
         public Vector2 size;
+        public float width => size.x;
+        public float height => size.y;
+        public Vector2 center => position + (size * 0.5f);
         public static bool operator ==(Rect a, Rect b) => true;
         public static bool operator !=(Rect a, Rect b) => false;
         public override bool Equals(object obj) => obj is Rect;
@@ -71,22 +77,32 @@ namespace UnityEngine
         public static Vector3 operator -(Vector3 a, Vector3 b) => new Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
         public static Vector3 operator -(Vector3 value) => new Vector3(-value.x, -value.y, -value.z);
         public static Vector3 operator *(Vector3 value, float scalar) => new Vector3(value.x * scalar, value.y * scalar, value.z * scalar);
+        public static bool operator ==(Vector3 a, Vector3 b) => true;
+        public static bool operator !=(Vector3 a, Vector3 b) => false;
+        public override bool Equals(object obj) => obj is Vector3;
+        public override int GetHashCode() => 0;
         public static Vector3 Lerp(Vector3 a, Vector3 b, float t) => b;
     }
 
     public struct Quaternion
     {
         public static Quaternion identity => new Quaternion();
+        public static Quaternion Euler(float x, float y, float z) => new Quaternion();
         public static Quaternion LookRotation(Vector3 forward, Vector3 upwards) => new Quaternion();
     }
 
     public static class Mathf
     {
+        public const float PI = 3.14159265359f;
         public const float Deg2Rad = 0.0174532924f;
         public static float Abs(float value) => Math.Abs(value);
         public static float Clamp(float value, float min, float max) => Math.Max(min, Math.Min(max, value));
         public static float Clamp01(float value) => Clamp(value, 0f, 1f);
+        public static float Cos(float value) => (float)Math.Cos(value);
+        public static float Sin(float value) => (float)Math.Sin(value);
+        public static float Min(float a, float b) => Math.Min(a, b);
         public static float Max(float a, float b) => Math.Max(a, b);
+        public static int Max(int a, int b) => Math.Max(a, b);
         public static float MoveTowards(float current, float target, float maxDelta) => target;
         public static float Exp(float power) => (float)Math.Exp(power);
         public static float Lerp(float a, float b, float t) => a + ((b - a) * t);
@@ -147,14 +163,54 @@ namespace UnityEngine
         public T AddComponent<T>() where T : new() { return new T(); }
     }
 
-    public enum PrimitiveType { Cube, Cylinder }
-    public class Material : Object { }
+    public enum PrimitiveType { Cube, Sphere, Capsule, Cylinder }
+    public class Shader : Object { public static Shader Find(string name) => new Shader(); }
+    public class Material : Object
+    {
+        public Color color;
+        public Material() { }
+        public Material(Shader shader) { }
+    }
     public class Renderer : Component { public Material sharedMaterial; }
+    public class MeshRenderer : Renderer { }
+    public class MeshFilter : Component { public Mesh sharedMesh; }
+    public class MeshCollider : Component { public Mesh sharedMesh; }
+    public class Mesh : Object
+    {
+        public Vector3[] vertices;
+        public int[] triangles;
+        public void RecalculateNormals() { }
+        public void RecalculateBounds() { }
+    }
 
     public class Camera : Component
     {
         public bool enabled;
         public float fieldOfView;
+        public CameraClearFlags clearFlags;
+        public Color backgroundColor;
+    }
+
+    public enum CameraClearFlags { SolidColor }
+    public enum FogMode { ExponentialSquared }
+    public enum FindObjectsSortMode { None }
+
+    public static class RenderSettings
+    {
+        public static bool fog;
+        public static FogMode fogMode;
+        public static Color fogColor;
+        public static float fogDensity;
+        public static Color ambientLight;
+    }
+
+    public enum LightType { Directional }
+
+    public class Light : Component
+    {
+        public LightType type;
+        public float intensity;
+        public Color color;
     }
 
     public class Canvas : Component
@@ -174,6 +230,7 @@ namespace UnityEngine
         public Vector2 sizeDelta;
         public Vector2 offsetMin;
         public Vector2 offsetMax;
+        public Rect rect;
     }
 
     public static class RectTransformUtility
@@ -243,6 +300,7 @@ namespace UnityEngine
         public float a;
         public Color(float r, float g, float b, float a = 1f) { this.r = r; this.g = g; this.b = b; this.a = a; }
         public static Color white => new Color(1f, 1f, 1f, 1f);
+        public static Color gray => new Color(0.5f, 0.5f, 0.5f, 1f);
     }
 
     public class Font : Object { }
@@ -271,6 +329,28 @@ namespace UnityEngine.EventSystems
 
 namespace UnityEngine.UI
 {
+    public class Graphic : UnityEngine.Component
+    {
+        public UnityEngine.Color color;
+        public UnityEngine.RectTransform rectTransform { get; } = new UnityEngine.RectTransform();
+        public void SetVerticesDirty() { }
+        protected virtual void OnPopulateMesh(VertexHelper vh) { }
+    }
+
+    public struct UIVertex
+    {
+        public UnityEngine.Color color;
+        public UnityEngine.Vector2 position;
+        public static UIVertex simpleVert => new UIVertex();
+    }
+
+    public class VertexHelper
+    {
+        public void Clear() { }
+        public void AddVert(UIVertex vertex) { }
+        public void AddTriangle(int a, int b, int c) { }
+    }
+
     public class GraphicRaycaster : UnityEngine.Component { }
 
     public class CanvasScaler : UnityEngine.Component

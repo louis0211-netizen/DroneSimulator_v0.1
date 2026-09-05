@@ -38,6 +38,8 @@ Implemented in this repository:
 - Minimal camera, HUD, and training ground hooks
 - Runtime training objective loop for ARM, takeoff, hover, movement, yaw, landing, crash, and reset
 - Dynamic button labels and warning HUD for throttle lockout, crash, and battery state
+- Polished mobile HUD with circular virtual sticks and right-side flight controls
+- Runtime environment selector with City, Forest, Mountain, and Beach training scenes
 
 ## Quick Start in Unity
 
@@ -60,6 +62,7 @@ The generated scene includes:
 - Objective and warning HUD
 - Left and right virtual joysticks
 - ARM, RESET, CAMERA, and MODE buttons
+- Environment selector for City, Forest, Mountain, and Beach
 
 ## Controls
 
@@ -76,6 +79,7 @@ Buttons:
 - RESET
 - CAMERA
 - FLIGHT MODE
+- CITY / FOREST / MOUNTAIN / BEACH
 
 The first training loop appears in the top HUD and advances through:
 

@@ -105,11 +105,6 @@ namespace DroneSimulator.HUD
                 {
                     inputManager.QueueCameraToggle();
                 }
-
-                if (cameraRig != null)
-                {
-                    cameraRig.ToggleCamera();
-                }
             });
 
             Text modeLabel = CreateActionButton(safeRoot, new Vector2(246f, 78f), UiIconType.FlightMode, "MODE", () =>

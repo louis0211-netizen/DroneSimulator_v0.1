@@ -171,7 +171,18 @@ namespace UnityEngine
     public enum PrimitiveType { Cube, Sphere, Capsule, Cylinder, Quad }
     public class Shader : Object { public static Shader Find(string name) => new Shader(); }
     public class Texture : Object { }
-    public class Texture2D : Texture { }
+    public enum TextureFormat { RGBA32 }
+    public enum TextureWrapMode { Repeat }
+    public enum FilterMode { Bilinear }
+    public class Texture2D : Texture
+    {
+        public TextureWrapMode wrapMode;
+        public FilterMode filterMode;
+        public Texture2D() { }
+        public Texture2D(int width, int height, TextureFormat textureFormat, bool mipChain) { }
+        public void SetPixel(int x, int y, Color color) { }
+        public void Apply() { }
+    }
     public class Material : Object
     {
         public Color color;
@@ -292,9 +303,22 @@ namespace UnityEngine
 
     public static class Input
     {
+        public static Vector3 acceleration;
+        public static Gyroscope gyro = new Gyroscope();
         public static bool GetKey(KeyCode key) => false;
         public static bool GetKeyDown(KeyCode key) => false;
         public static float GetAxisRaw(string axisName) => 0f;
+    }
+
+    public class Gyroscope
+    {
+        public bool enabled;
+        public Vector3 rotationRateUnbiased;
+    }
+
+    public static class SystemInfo
+    {
+        public static bool supportsGyroscope;
     }
 
     public static class Debug

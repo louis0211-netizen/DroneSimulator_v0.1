@@ -12,7 +12,9 @@ namespace DroneSimulator.HUD
         City,
         Forest,
         Mountain,
-        Beach
+        Beach,
+        MotionSensor,
+        Calibrate
     }
 
     public sealed class UiIconGraphic : Graphic
@@ -72,6 +74,18 @@ namespace DroneSimulator.HUD
                     AddCircle(vh, center + new Vector2(-unit * 0.36f, unit * 0.32f), unit * 0.18f, 18);
                     AddArc(vh, center + new Vector2(unit * 0.1f, -unit * 0.22f), unit * 0.68f, unit * 0.56f, 196f, 344f, 28);
                     AddArc(vh, center + new Vector2(unit * 0.18f, -unit * 0.42f), unit * 0.55f, unit * 0.47f, 200f, 342f, 24);
+                    break;
+                case UiIconType.MotionSensor:
+                    AddArc(vh, center, unit * 0.68f, unit * 0.56f, 210f, 330f, 18);
+                    AddArc(vh, center, unit * 0.46f, unit * 0.36f, 215f, 325f, 18);
+                    AddCircle(vh, center + new Vector2(0f, -unit * 0.22f), unit * 0.1f, 14);
+                    AddRect(vh, center + new Vector2(0f, unit * 0.22f), new Vector2(unit * 0.12f, unit * 0.48f));
+                    break;
+                case UiIconType.Calibrate:
+                    AddRing(vh, center, unit * 0.58f, unit * 0.46f, 32);
+                    AddRect(vh, center, new Vector2(unit * 0.85f, unit * 0.08f));
+                    AddRect(vh, center, new Vector2(unit * 0.08f, unit * 0.85f));
+                    AddCircle(vh, center, unit * 0.12f, 14);
                     break;
                 default:
                     AddRing(vh, center, unit * 0.58f, unit * 0.43f, 36);

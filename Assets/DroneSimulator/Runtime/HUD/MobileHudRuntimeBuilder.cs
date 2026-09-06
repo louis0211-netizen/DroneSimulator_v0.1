@@ -78,7 +78,15 @@ namespace DroneSimulator.HUD
                 inputManager.ConfigureVirtualJoysticks(leftJoystick.Joystick, rightJoystick.Joystick);
             }
 
-            Text armLabel = CreateActionButton(safeRoot, new Vector2(-246f, 78f), UiIconType.Power, "ARM", () =>
+            Text motionLabel = CreateActionButton(safeRoot, new Vector2(-430f, 78f), UiIconType.MotionSensor, "TILT", () =>
+            {
+                if (inputManager != null)
+                {
+                    inputManager.ToggleMotionControls();
+                }
+            });
+
+            Text armLabel = CreateActionButton(safeRoot, new Vector2(-258f, 78f), UiIconType.Power, "ARM", () =>
             {
                 if (inputManager != null)
                 {
@@ -86,7 +94,7 @@ namespace DroneSimulator.HUD
                 }
             });
 
-            Text resetLabel = CreateActionButton(safeRoot, new Vector2(-82f, 78f), UiIconType.Reset, "RESET", () =>
+            Text resetLabel = CreateActionButton(safeRoot, new Vector2(-86f, 78f), UiIconType.Reset, "RESET", () =>
             {
                 if (inputManager != null)
                 {
@@ -99,7 +107,7 @@ namespace DroneSimulator.HUD
                 }
             });
 
-            Text cameraLabel = CreateActionButton(safeRoot, new Vector2(82f, 78f), UiIconType.Camera, "CAM", () =>
+            Text cameraLabel = CreateActionButton(safeRoot, new Vector2(86f, 78f), UiIconType.Camera, "CAM", () =>
             {
                 if (inputManager != null)
                 {
@@ -107,11 +115,19 @@ namespace DroneSimulator.HUD
                 }
             });
 
-            Text modeLabel = CreateActionButton(safeRoot, new Vector2(246f, 78f), UiIconType.FlightMode, "MODE", () =>
+            Text modeLabel = CreateActionButton(safeRoot, new Vector2(258f, 78f), UiIconType.FlightMode, "MODE", () =>
             {
                 if (inputManager != null)
                 {
                     inputManager.QueueFlightModeToggle();
+                }
+            });
+
+            Text calibrateLabel = CreateActionButton(safeRoot, new Vector2(430f, 78f), UiIconType.Calibrate, "TRIM", () =>
+            {
+                if (inputManager != null)
+                {
+                    inputManager.CalibrateMotionNeutral();
                 }
             });
 
@@ -125,7 +141,7 @@ namespace DroneSimulator.HUD
 
             if (trainingSession != null)
             {
-                trainingSession.ConfigureHudControls(objective, warning, armLabel, resetLabel, cameraLabel, modeLabel);
+                trainingSession.ConfigureHudControls(objective, warning, armLabel, resetLabel, cameraLabel, modeLabel, motionLabel, calibrateLabel);
             }
 
             built = true;
@@ -194,7 +210,7 @@ namespace DroneSimulator.HUD
 
         private static Text CreateActionButton(RectTransform parent, Vector2 position, UiIconType iconType, string label, UnityEngine.Events.UnityAction action)
         {
-            RectTransform rect = CreateButtonRoot("Action " + label, parent, position, new Vector2(126f, 86f));
+            RectTransform rect = CreateButtonRoot("Action " + label, parent, position, new Vector2(142f, 86f));
             AddIcon(rect, iconType, new Vector2(0f, 13f), new Vector2(38f, 38f), new Color(0.88f, 0.95f, 1f, 0.98f));
             Text text = CreateText(label + " Label", rect, label, 18, new Color(0.88f, 0.95f, 1f, 0.95f), TextAnchor.MiddleCenter);
             RectTransform labelRect = (RectTransform)text.transform;
@@ -202,7 +218,7 @@ namespace DroneSimulator.HUD
             labelRect.anchorMax = new Vector2(0.5f, 0f);
             labelRect.pivot = new Vector2(0.5f, 0f);
             labelRect.anchoredPosition = new Vector2(0f, 9f);
-            labelRect.sizeDelta = new Vector2(112f, 22f);
+            labelRect.sizeDelta = new Vector2(128f, 22f);
             rect.gameObject.GetComponent<Button>().onClick.AddListener(action);
             return text;
         }

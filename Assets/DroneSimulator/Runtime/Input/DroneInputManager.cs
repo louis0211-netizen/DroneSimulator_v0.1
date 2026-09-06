@@ -18,6 +18,10 @@ namespace DroneSimulator.Input
         [SerializeField] private bool enableKeyboardInEditor = true;
         [SerializeField] private float keyboardThrottleSpeed = 0.55f;
 
+        [Header("Mobile Motion Sensors")]
+        [SerializeField] private MotionSensorFlightInput motionSensors = new MotionSensorFlightInput();
+        [SerializeField, Range(0f, 1f)] private float motionSensorBlend = 0.82f;
+
         [Header("Action Events")]
         [SerializeField] private UnityEvent resetRequested = new UnityEvent();
         [SerializeField] private UnityEvent cameraToggleRequested = new UnityEvent();
@@ -29,8 +33,20 @@ namespace DroneSimulator.Input
         private bool flightModeQueued;
 
         public DroneInputState LastInputState => state;
+        public bool MotionControlsEnabled => motionSensors != null && motionSensors.IsEnabled;
+        public string MotionControlsStatus => motionSensors != null ? motionSensors.StatusText : "TILT OFF";
         public UnityEvent ResetRequested => resetRequested;
         public UnityEvent CameraToggleRequested => cameraToggleRequested;
+
+        private void Awake()
+        {
+            if (motionSensors == null)
+            {
+                motionSensors = new MotionSensorFlightInput();
+            }
+
+            motionSensors.Initialize();
+        }
 
         public void ConfigureVirtualJoysticks(VirtualJoystick newLeftJoystick, VirtualJoystick newRightJoystick)
         {
@@ -72,10 +88,29 @@ namespace DroneSimulator.Input
             flightModeQueued = true;
         }
 
+        public void ToggleMotionControls()
+        {
+            EnsureMotionSensors();
+            motionSensors.ToggleEnabled();
+        }
+
+        public void CalibrateMotionNeutral()
+        {
+            EnsureMotionSensors();
+            motionSensors.CalibrateNeutral();
+        }
+
         private void UpdateContinuousInput()
         {
             Vector2 left = leftJoystick != null ? leftJoystick.Value : Vector2.zero;
             Vector2 right = rightJoystick != null ? rightJoystick.Value : Vector2.zero;
+            Vector2 motion = Vector2.zero;
+
+            EnsureMotionSensors();
+            if (motionSensors != null)
+            {
+                motion = motionSensors.ReadRollPitch();
+            }
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (enableKeyboardInEditor)
@@ -90,8 +125,8 @@ namespace DroneSimulator.Input
 
             state.throttle = ApplyThrottleCurve(left.y, throttleExpo);
             state.yaw = ApplyExpo(ApplyDeadZone(left.x, deadZone), stickExpo);
-            state.pitch = ApplyExpo(ApplyDeadZone(right.y, deadZone), stickExpo);
-            state.roll = ApplyExpo(ApplyDeadZone(right.x, deadZone), stickExpo);
+            state.pitch = ApplyExpo(ApplyDeadZone(BlendStickAndMotion(right.y, motion.y), deadZone), stickExpo);
+            state.roll = ApplyExpo(ApplyDeadZone(BlendStickAndMotion(right.x, motion.x), deadZone), stickExpo);
         }
 
         private void ReadKeyboardDebug(ref Vector2 left, ref Vector2 right)
@@ -166,6 +201,24 @@ namespace DroneSimulator.Input
             float throttle = Mathf.Clamp01(value);
             float curved = throttle * throttle;
             return Mathf.Lerp(throttle, curved, Mathf.Clamp01(expo));
+        }
+
+        private float BlendStickAndMotion(float stickValue, float motionValue)
+        {
+            float stick = Mathf.Clamp(stickValue, -1f, 1f);
+            float stickAuthority = Mathf.Abs(stick);
+            float motionAuthority = Mathf.Clamp01(motionSensorBlend) * (1f - stickAuthority * 0.55f);
+            return Mathf.Clamp(stick + motionValue * motionAuthority, -1f, 1f);
+        }
+
+        private void EnsureMotionSensors()
+        {
+            if (motionSensors == null)
+            {
+                motionSensors = new MotionSensorFlightInput();
+            }
+
+            motionSensors.Initialize();
         }
 
         private static bool Consume(ref bool queued)

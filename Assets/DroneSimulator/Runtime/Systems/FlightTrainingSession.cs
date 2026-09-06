@@ -23,6 +23,8 @@ namespace DroneSimulator.Systems
         [SerializeField] private Text resetButtonText;
         [SerializeField] private Text cameraButtonText;
         [SerializeField] private Text modeButtonText;
+        [SerializeField] private Text motionButtonText;
+        [SerializeField] private Text calibrateButtonText;
 
         [Header("Milestones")]
         [SerializeField] private float takeoffAltitudeMeters = 1.0f;
@@ -90,7 +92,9 @@ namespace DroneSimulator.Systems
             Text newArmButtonText,
             Text newResetButtonText,
             Text newCameraButtonText,
-            Text newModeButtonText)
+            Text newModeButtonText,
+            Text newMotionButtonText,
+            Text newCalibrateButtonText)
         {
             objectiveText = newObjectiveText;
             warningText = newWarningText;
@@ -98,6 +102,8 @@ namespace DroneSimulator.Systems
             resetButtonText = newResetButtonText;
             cameraButtonText = newCameraButtonText;
             modeButtonText = newModeButtonText;
+            motionButtonText = newMotionButtonText;
+            calibrateButtonText = newCalibrateButtonText;
         }
 
         private void ResolveReferences()
@@ -240,6 +246,8 @@ namespace DroneSimulator.Systems
             SetText(resetButtonText, "RESET");
             SetText(cameraButtonText, cameraRig != null && cameraRig.IsFpvCameraActive ? "FPV" : "CHASE");
             SetText(modeButtonText, flightController != null ? flightController.CurrentMode.ToString().ToUpperInvariant() : "MODE");
+            SetText(motionButtonText, inputManager != null ? inputManager.MotionControlsStatus : "TILT OFF");
+            SetText(calibrateButtonText, "TRIM");
         }
 
         private string BuildObjectiveText()
